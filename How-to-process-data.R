@@ -34,4 +34,6 @@ mean(df_exam$science)
 #엑셀파일의 세 번째 시트만 불러오기
 df_csv_exam <-read.csv(file.choose())
 
-#p96
+#p96 9/28
+#RDS : R전용 데이터 파일
+saveRDS(df_midterm, file = "df_midterm.rds)"
