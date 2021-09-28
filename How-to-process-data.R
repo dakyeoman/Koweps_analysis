@@ -36,4 +36,11 @@ df_csv_exam <-read.csv(file.choose())
 
 #p96 9/28
 #RDS : R전용 데이터 파일
-saveRDS(df_midterm, file = "df_midterm.rds)"
+saveRDS(df_midterm, file = "df_midterm.rds")
+rm(df_midterm) #데이터 삭제
+df_midterm <- readRDS("df_midterm.rds")
+
+        
+        
+        
+        
