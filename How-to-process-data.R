@@ -40,7 +40,71 @@ saveRDS(df_midterm, file = "df_midterm.rds")
 rm(df_midterm) #데이터 삭제
 df_midterm <- readRDS("df_midterm.rds")
 
-        
-        
-        
-        
+#Modify data
+exam <- read.csv(file.choose()) #csv_exam.csv
+head(exam) #앞에서부터  6행 출력
+head(exam, 10) #첫 10행 출력
+tail(exam) #뒤에서부터 6행 출력    
+View(exam)
+dim(exam) #행/열 출력 
+str(exam) #모든 변수들의 속성 파악
+summary(exam) #요약 통계량 출력
+
+#install.packages("ggplot2")    
+library(ggplot2)
+mpg <- as.data.frame(ggplot2::mpg) #::로 특정 패키지의 함수, 데이터 저장 
+View(mpg)
+dim(mpg)
+str(mpg) #num:실수, int:정수
+summary(mpg)
+
+#Change Variable name 
+library(dplyr)
+df_raw <- data.frame(var1 = c(1, 2, 1), var2 = c(2, 3, 2))
+df_new <- df_raw #make copy
+df_new <- rename(df_new, v2 = var2) #rename(df, 새 변수명 = 기존 변수명)
+
+mpg_new <- mpg
+mpg_new <- rename(mpg_new, city = cty, highway = hwy)
+
+#Make Derived variable 
+# - 변수 조합
+df <- data.frame(var1 = c(4, 3, 8), 
+                 var2 = c(2, 6, 1))
+df$var_sum <- df$var1 + df$var2 
+
+mpg$total <- (mpg$cty + mpg$hwy) / 2
+head(mpg)
+
+# - 조건문 활용(기준점): 합격 판정 변수 생성
+summary(mpg$total)
+hist(mpg$total) 
+mpg$test <- ifelse(mpg$total >= 20, "pass", "fail") #20 이상 통과로 가정
+head(mpg)
+
+table(mpg$test) # (P/F)빈도표
+qplot(mpg$test) # 막대그래프 
+
+#중첩조건문 - 2개 이상 범주 생성
+mpg$grade <- ifelse(mpg$total >= 30, "A",
+                    ifelse(mpg$total >= 25, "B",
+                           ifelse(mpg$total >= 20, "C", "D"))) 
+head(mpg, 20) #확인
+table(mpg$grade)
+qplot(mpg$grade)
+
+#page123 practice
+midwest_raw <- as.data.frame(ggplot2::midwest)
+midwest <- midwest_raw
+summary(midwest)
+
+midwest <- rename(midwest, total = poptotal, asian = popasian)
+midwest$asian_percentage <- midwest$asian / midwest$total
+hist(midwest$asian_percentage)
+summary(midwest$asian_percentage)
+mean <- mean(midwest$asian_percentage)
+
+midwest$asian_size <- ifelse(midwest$asian_percentage >= mean, "large", "smaill" )
+table(midwest$asian_percentage)
+qplot(midwest$asian_percentage)
+qplot(midwest$asian_size)
