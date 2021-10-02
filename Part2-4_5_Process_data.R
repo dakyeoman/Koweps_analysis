@@ -108,3 +108,9 @@ midwest$asian_size <- ifelse(midwest$asian_percentage >= mean, "large", "smaill"
 table(midwest$asian_percentage)
 qplot(midwest$asian_percentage)
 qplot(midwest$asian_size)
+
+#<6-5. mutate()로 파생변수 추가>
+exam %>%
+  mutate(total = math + english + science) %>% 
+  head
+

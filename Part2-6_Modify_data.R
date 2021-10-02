@@ -1,5 +1,5 @@
 #데이터 전처리 Data Preprocessing
-
+library(dplyr)
 #----------dplyr Package----------
 # - filter():행 추출
 # - select():열(변수) 추출
@@ -77,4 +77,94 @@ exam %>% arrange(class, math)
 
 #p141 practice: audi가 생산한 자동차 중 hwy 상위 5개 제품 추출
 mpg %>% filter(manufacturer == "audi") %>% arrange(desc(hwy)) %>% head(5)
+
+#<6-5. mutate()로 파생변수 추가>
+exam %>%
+  mutate(total = math + english + science, 
+         mean = (math + english + science)/3) %>% 
+  arrange(desc(total, mean)) %>% 
+  head
+
+exam %>%
+  mutate(scn_test = ifelse(science >= 60, "pass", "fail"))%>% 
+  head
+
+#p144 practice
+mpg2 <-mpg
+mpg2 %>% 
+  mutate(ttl_mileage = cty + hwy, 
+         avr_mileage = ttl_mileage/2) %>%
+  arrange(desc(avr_mileage, ttl_mileage)) %>%
+  head(3)
+
+#<6-6. summarise()로 집단별 요약하기>
+exam %>% 
+  group_by(class) %>% #class별로 분리 
+  summarise(mean_math = mean(math)) #math 평균 산출
+
+exam %>%
+  group_by(class) %>%
+  summarise(mean_math = mean(math), 
+            sum_math = sum(math), 
+            median_math = median(math), 
+            sd_math = sd(math),
+            n = n()) #n(): 데이터의 빈도(몇 행인가)를 구함, sd():표준편차
+mpg %>%
+  group_by(manufacturer, drv) %>% #회사별, 구동방식별 분리
+  summarise(mean_cty = mean(cty)) %>% #cty 평균 산출
+  head(5)
+
+#dplyr 조합
+mpg %>% 
+  group_by(manufacturer) %>%
+  filter(class == "suv") %>% #"suv"추출
+  mutate(tot = (cty + hwy)/2) %>% #통합 연비 변수 생성
+  summarise(totm = mean(tot)) %>% #통합 연비 평균 산출 
+  arrange(desc(totm)) %>%
+  head(5)
+
+#p150 practice
+mpg %>%
+  group_by(class) %>%
+  mutate(meancty = mean(cty)) %>%
+  arrange(desc(meancty)) %>%
+  mutate(meanhwy = mean(hwy)) %>%
+  head(3)
+
+#q4
+mpg %>%
+  group_by(manufacturer) %>%
+  filter(class == "compact") %>%
+  summarise(n = n()) %>%
+  arrange(desc(n))
+
+#<6-7. 행/열 데이터 수합>
+#left_join()으로 행(가로)데이터 합치기
+mid <- data.frame(id = c(1, 2, 3, 4, 5), 
+                  midterm = c(60, 80, 70, 90, 85))
+fin <- data.frame(id = c(1, 2, 3, 4, 5), 
+                  final = c(70, 83, 65, 95, 80))
+total <- left_join(mid, fin, by = "id") #id를 기준으로 합쳐 total에 할당
+total   
+
+#다른 데이터 변수 추가
+name <- data.frame(class = c(1, 2, 3, 4, 5),
+                   teacher = c("Kim", "Choi", "Jung", "Lee", "Ahn")) #name 데이터 생성 
+exam_new <- left_join(exam, name, by = "class")
+exam_new
+
+#bind_rows()로 열(세로)데이터 수합: 합치는 데이터의 변수명이 같아야 한다 *다를 경우 rename()활용 
+group_a <- data.frame(id = c(1, 2, 3, 4, 5), 
+                  test = c(60, 80, 70, 90, 85))
+group_b <- data.frame(id = c(6, 7, 8, 9, 10), 
+                  test = c(70, 83, 65, 95, 80))
+group_all <- bind_rows(group_a, group_b)
+
+#p156 practice
+fuel <- data.frame(fl = c("c", "d", "e", "p", "r"), 
+                   price_fl = c(2.35, 2.38, 2.11, 2.76, 2.22))
+new_mpg <- left_join(fuel, mpg, by = "fl") 
+new_mpg %>%
+  select(model, fl, price_fl) %>%
+  head(5)
 
