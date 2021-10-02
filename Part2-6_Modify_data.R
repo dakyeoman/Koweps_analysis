@@ -27,18 +27,17 @@ mpgdata <- as.data.frame(ggplot2::mpg)
 mpg <- mpgdata
 
 #배기량-연비 비교
-displ_und4 <- mpg %>% filter(displ <= 4)
-displ_upp5 <- mpg %>% filter(displ >= 5)
-mean_und4 <- mean(displ_und4$displ)
-mean_upp5 <- mean(displ_upp5$displ)
-mean_und4 < mean_upp5 #TRUE
+displ_a <- mpg %>% filter(displ <= 4)
+displ_b <- mpg %>% filter(displ >= 5)
+mean(displ_a$hwy)
+mean(displ_b$hwy)
 
 #제조사-도시연비(cty) 비교
 dspl_audi <- mpg %>% filter(manufacturer == "audi")
-a <- mean(dspl_audi$cty)
+mean(dspl_audi$cty)
 dspl_toyota <- mpg %>% filter(manufacturer == "toyota")
-b <- mean(dspl_toyota$cty)
-a < b #TRUE, 다른 방법은 없나? 
+mean(dspl_toyota$cty)
+
 
 #제조사-고속도로 평균 연비(hwy) 
 displ_chevrolet <- mean((mpg %>% filter(manufacturer == "chevrolet"))$hwy)
@@ -62,7 +61,7 @@ exam %>%
   select(class, english) %>% 
   head(10)
 
-#practice p138  
+#practice p138 #추출
 mpg_q1 <- mpg %>% select(class, cty)
 head(mpg_q1) 
 
@@ -76,7 +75,9 @@ exam %>% arrange(desc(english)) #english 변수 내림차순 정렬
 exam %>% arrange(class, math) 
 
 #p141 practice: audi가 생산한 자동차 중 hwy 상위 5개 제품 추출
-mpg %>% filter(manufacturer == "audi") %>% arrange(desc(hwy)) %>% head(5)
+mpg %>% filter(manufacturer == "audi") %>% 
+  arrange(desc(hwy)) %>% 
+  head(5)
 
 #<6-5. mutate()로 파생변수 추가>
 exam %>%
@@ -126,17 +127,25 @@ mpg %>%
 #p150 practice
 mpg %>%
   group_by(class) %>%
-  mutate(meancty = mean(cty)) %>%
-  arrange(desc(meancty)) %>%
-  mutate(meanhwy = mean(hwy)) %>%
+  summarise(meancty = mean(cty)) 
+
+mpg %>%
+  group_by(class) %>%
+  summarise(mean_cty = mean(cty)) %>%
+  arrange(desc(mean_cty))
+
+mpg %>%
+  group_by(manufacturer) %>%
+  summarise(mean_hwy = mean(hwy)) %>%
+  arrange(desc(mean_hwy)) %>%
   head(3)
 
 #q4
 mpg %>%
   group_by(manufacturer) %>%
   filter(class == "compact") %>%
-  summarise(n = n()) %>%
-  arrange(desc(n))
+  summarise(count = n()) %>%
+  arrange(desc(count))
 
 #<6-7. 행/열 데이터 수합>
 #left_join()으로 행(가로)데이터 합치기
@@ -160,7 +169,7 @@ group_b <- data.frame(id = c(6, 7, 8, 9, 10),
                   test = c(70, 83, 65, 95, 80))
 group_all <- bind_rows(group_a, group_b)
 
-#p156 practice
+#p157 practice
 fuel <- data.frame(fl = c("c", "d", "e", "p", "r"), 
                    price_fl = c(2.35, 2.38, 2.11, 2.76, 2.22))
 new_mpg <- left_join(fuel, mpg, by = "fl") 
