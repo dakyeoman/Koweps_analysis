@@ -177,3 +177,32 @@ new_mpg %>%
   select(model, fl, price_fl) %>%
   head(5)
 
+#p160 practice
+midwest_copy <- ggplot2::midwest
+midwest <- midwest_copy
+
+#q1-2
+midwest %>% 
+  mutate(perckids = 100 - popadults / poptotal * 100) %>%
+  select(county, perckids) %>%
+  arrange(desc(perckids)) %>%
+  head(5)
+
+#q3 등급 분류 & 각 등급에 속한 지역의 수 
+midwest %>%
+  mutate(perckids = 100 - popadults / poptotal * 100) %>%
+  mutate(grade = ifelse(perckids >= 40, "large",
+                        ifelse(perckids >=30, "middle",
+                               ifelse(perckids < 30, "small", NA)))) %>%
+  select(county, grade) %>%
+  group_by(grade) %>%
+  summarise(n = n())
+
+#q4 아시아인 인구 / 전체 인구 백분율 변수 추가, 하위 10개 지역의 state, county의 아시아인 인구 백분률
+midwest %>%
+  mutate(percasian = popasian / poptotal * 1000) %>%
+  select(state, county, percasian) %>%
+  arrange(desc(percasian)) %>5
+
+
+
