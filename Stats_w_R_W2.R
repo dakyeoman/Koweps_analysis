@@ -45,9 +45,19 @@ sd(x) #표준편차
 s <- sort(x) ;s #오름차순 정렬
 length(x)
 quantile(x, c(0.1, 0.25, 0.5, 0.95))
+fivenum(x)#min., Q1, Q2, Q3, max.
+summary(x)#min., Q1, Q2(median), mean, Q3, max.
+boxplot(x)
+boxplot(x, range=0) #(range = n)=(IQR * n)
+boxplot(x, range=1.5)
+boxplot(x, range=1.0)
 
+#이변량 자료와 상관계수
+x <- faithful$eruptions
+y <- faithful$waiting
+plot(x, y)
+cor(x, y) #표본상관계수
 
-
-
-
-
+x <- c(1, 0, -1, 0)
+y <- c(0, 1, 0, -1)
+cor(x, y)
