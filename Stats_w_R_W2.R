@@ -35,10 +35,16 @@ hist(faithful$waiting)
 #줄기-잎 그림
 stem(faithful$waiting)
 
-
-
-
-
+#중심/퍼짐 측도
+data()
+x <- stackloss$stack.loss
+x
+mean(x)
+var(x) #분산
+sd(x) #표준편차
+s <- sort(x) ;s #오름차순 정렬
+length(x)
+quantile(x, c(0.1, 0.25, 0.5, 0.95))
 
 
 
