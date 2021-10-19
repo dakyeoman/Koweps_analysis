@@ -203,6 +203,66 @@ midwest %>%
   mutate(percasian = popasian / poptotal * 1000) %>%
   select(state, county, percasian) %>%
   arrange(desc(percasian)) %>5
+#앗 안 돌아간다. 
 
 
+#데이터 정제 211019-----------------------------------------------
+#7-1 결측치<NA> 정제
+df <- data.frame(sex = c("M", "F", NA, "M", "F"),
+                 score = c(5, 4, 3, 4, NA)) ;df
+
+#결측치 확인 
+is.na(df) 
+table(is.na(df)) #결측치 빈도 출력
+table(is.na(df$sex))
+table(is.na(df$score))
+#결측치가 포함된 데이터는 정상적 연산 불가능
+mean(df$score) 
+sum(df$score) 
+
+#결측치 제거하기;is.na()를 filter()에 적용 -> 결측치가 있는 행을 제거
+library(dplyr)
+
+df %>% filter(is.na(score)) #score = NA 인 데이터만 출력
+df %>% filter(!is.na(score)) #score 결측치 제거;결측치가 아닌 행만 출력
+
+df_no_miss <- df %>% filter(!is.na(score)) 
+mean(df_no_miss$score)
+sum(df_no_miss$score)
+
+df_no_miss <- df %>% filter(!is.na(score) & !is.na(sex)) ;df_no_miss
+#여러 변수 동시에 결측치 제거된 데이터 추출 
+
+df_no_miss2 <- na.omit(df) ;df_no_miss2 #모든 변수에 결측치 없는 데이터 추출
+#na.omit():변수 지정하지 않고 결측치가 있는 행을 한 번에 제거, but 분석에 필요한 행까지 손실될 수 있다. 
+
+#수치 연산 함수의 결측치 제외기능; na.rm 파라미터 = TRUE
+mean(df$score, na.rm = T)
+sum(df$score, na.rm = T)
+exam <- read.csv(file.choose()) #csv_exam.csv
+exam[c(3, 8, 15), "math"] <- NA ;exam #[행 위치, 열 위치]:데이터 위치 지칭, / 3, 8, 15행의 math에 NA 할당
+exam %>% summarise(mean_math = mean(math)) #현재 결측치 포함됨 -> NA
+exam %>% summarise(mean_math = mean(math, na.rm = T), 
+                   sum_math = sum(math, na.rm = T), 
+                   median_math = median(math, na.rm = T))
+
+#결측치 대체법Imputation; 데이터 손실로 분석 결과가 왜곡되는 문제 보완 가능
+#평균값으로 결측치 대체하기(앞에서 exam데이터의 [c(3, 8, 15), math] = NA)
+mean(exam$math, na.rm = T) #1.평균값
+exam$math <- ifelse(is.na(exam$math), 55, exam$math) #math=NA면 55로 대체
+table(is.na(exam$math)) #결측치 빈도표 생성 (*결측치 없음)
+exam
+mean(exam$math)
+
+#p170문제 해결
+mpg <- as.data.frame(ggplot2::mpg)
+mpg[c(65, 124, 131, 153, 212), "hwy"] <- NA #NA 할당 
+
+#q1결측치 확인
+is.na(mpg$drv) 
+table(is.na(mpg$drv))#결측치 없음
+is.na(mpg$hwy) 
+table(is.na(mpg$hwy))#결측치 5개
+
+#q2 filter()로 hwy변수의 결측치 제외- 어떤 구동 방식의 hwy 평균이 높은지 하나의 dplyr구문으로 구성
 
