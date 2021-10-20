@@ -265,4 +265,7 @@ is.na(mpg$hwy)
 table(is.na(mpg$hwy))#결측치 5개
 
 #q2 filter()로 hwy변수의 결측치 제외- 어떤 구동 방식의 hwy 평균이 높은지 하나의 dplyr구문으로 구성
-
+mpg %>% 
+  filter(!is.na(hwy)) %>%
+  group_by(drv) %>%
+  summarise(mean_hwy = mean(hwy))
