@@ -353,13 +353,50 @@ ggplot(data = midwest, aes(x = poptotal, y = popasian)) +
 
 
 
-#2.막대그래프(qplot대체) geom_col()
+#2.평균막대그래프(qplot대체) geom_col()
 #구동 방식별 평균 고속도로 연비  
+library(dplyr)
 
+df_mpg <- mpg %>%
+  filter(!is.na(drv) & !is.na(cty)) %>%
+  group_by(drv) %>%
+  summarise(mean_hwy = mean(hwy));df_mpg
 
+ggplot(data = df_mpg, aes(x = drv, y = mean_hwy)) + geom_col() #그래프 생성
+ggplot(data = df_mpg, aes(x = reorder(drv, -mean_hwy), y = mean_hwy)) + geom_col() 
+#reorder(x축 변수, -(내림차순)정렬 기준 변수)
 
+#3.빈도막대그래프: geom_bar(x축 연속변수만 지정)
+ggplot(data = mpg, aes(x = drv)) + geom_bar() #drv 변수 항목별 빈도 막대 그래프 생성 
+ggplot(data = mpg, aes(x = hwy)) + geom_bar()
 
+#***평균막대그래프(geom_col)은 데이터 요약표로 만든 그래프, 빈도막대그래프(geom_bar)는 원자료로 만든 그래프 
 
+#p193 문제해결
+#Q1. "suv"차종에서 평균 도시 연비(cty)가 가장 높은 회사 다섯 곳을 막대그래프로 표현해보자 
 
+df_suv <- mpg %>% 
+  filter(class == "suv") %>% 
+  group_by(manufacturer) %>%
+  summarise(cty_mean = mean(cty)) %>%
+  arrange(desc(cty_mean)) %>%
+  head(5) #상위 5개 
+df_suv 
 
-
+mpg %>% 
+  group_by(manufacturer) %>%
+  filter(class == "suv") %>% #"suv"추출
+  mutate(tot = (cty + hwy)/2) %>% #통합 연비 변수 생성
+  summarise(totm = mean(tot)) %>% #통합 연비 평균 산출 
+  arrange(desc(totm)) %>%
+  head(5)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  
