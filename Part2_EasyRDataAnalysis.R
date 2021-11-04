@@ -240,7 +240,7 @@ df_no_miss2 <- na.omit(df) ;df_no_miss2 #모든 변수에 결측치 없는 데�
 mean(df$score, na.rm = T)
 sum(df$score, na.rm = T)
 exam <- read.csv(file.choose()) #csv_exam.csv
-exam[c(3, 8, 15), "math"] <- NA ;exam #[행 위치, 열 위치]:데이터 위치 지칭, / 3, 8, 15행의 math에 NA 할당
+exam[c(3, 8, 15), "math"] <- NA ;exam #[행 위치, 열 위치]:데이터 위치 지칭, / 3, 8, 15행의 math열에 NA 할당
 exam %>% summarise(mean_math = mean(math)) #현재 결측치 포함됨 -> NA
 exam %>% summarise(mean_math = mean(math, na.rm = T), 
                    sum_math = sum(math, na.rm = T), 
@@ -249,7 +249,7 @@ exam %>% summarise(mean_math = mean(math, na.rm = T),
 #결측치 대체법Imputation; 데이터 손실로 분석 결과가 왜곡되는 문제 보완 가능
 #평균값으로 결측치 대체하기(앞에서 exam데이터의 [c(3, 8, 15), math] = NA)
 mean(exam$math, na.rm = T) #1.평균값
-exam$math <- ifelse(is.na(exam$math), 55, exam$math) #math=NA면 55로 대체
+exam$math <- ifelse(is.na(exam$math), 55, exam$math) #math=NA면 55로 대체, 그렇지 않으면 원래의 값.
 table(is.na(exam$math)) #결측치 빈도표 생성 (*결측치 없음)
 exam
 mean(exam$math)
@@ -268,7 +268,7 @@ table(is.na(mpg$hwy))#결측치 5개
 mpg %>% 
   filter(!is.na(hwy)) %>%
   group_by(drv) %>%
-  summarise(mean_hwy = mean(hwy))
+  summarise(mean_hwy = mean(hwy)) #hwy별 평균 구하기
 
 
 #7-2 이상치 정제하기
@@ -280,10 +280,86 @@ table(outlier$score)
 
 #결측처리
 outlier$sex <- ifelse(outlier$sex == 3, NA, outlier$sex);outlier
-outlier$score <- ifelse(outlier$score == 6, NA, outlier$score);outlier
+outlier$score <- ifelse(outlier$score > 5, NA, outlier$score);outlier
 
 #분석 시 결측치 제외
 outlier %>%
   filter(!is.na(sex) & !is.na(score)) %>%
-  group_by(sex) %>%
-  summarise(mean_score = mean(score))
+  group_by(sex) %>% #성별 분리
+  summarise(mean_score = mean(score)) #평균 산출
+
+#Box plot 으로 이상치 제거 
+boxplot(mpg$hwy)
+
+boxplot(mpg$hwy)$stats 
+#아랫쪽 극단치 경계, Q1, median, Q3, 위쪽 극단치 경계(q1, q3 밖 1.5 IQR 내 최댓값)
+#이때 [n,]는 매트릭스 데이터 구조의 인덱스 값
+
+mpg$hwy <- ifelse(mpg$hwy < 12 | mpg$hwy > 37, NA, mpg$hwy)
+table(is.na(mpg$hwy))
+#Q1 - Q3 밖의 값을 결측 처리
+
+mpg %>% 
+  group_by(drv) %>%
+  summarise(mean_hwy = mean(hwy, na.rm = T))
+#결측치 제외한 drv별 hwy 평균
+
+
+
+#p178 문제해결-------------------------------------------------------------
+mpg <- as.data.frame(ggplot2::mpg)
+#(이상치 만들기)
+mpg[c(10,14,58,93), "drv"] <- "k" #hwy 이상치 할당
+mpg[c(29,43,129,203), "cty"] <- c(3, 4, 39, 42) #cty 이상치 할당
+
+#Q1. drv 이상치 확인 - 결측처리 후 재확인 
+table(mpg$drv) #1. 이상치 확인
+mpg$drv <- ifelse(mpg$drv %in% c("k"), NA, mpg$drv) #drv 중 "k"값을 NA로 변환 
+#or mpg$drv <- ifelse(mpg$drv %in% c(4, "f", "r"), mpg$drv, NA) 
+table(mpg$drv) #결측처리됨 
+
+#Q2. cty 이상치 확인 
+boxplot(mpg$cty)$stats
+mpg$cty <- ifelse(mpg$cty < 9 | mpg$cty > 26, NA, mpg$cty)
+boxplot(mpg$cty)
+
+#Q3. 이상치 제외후 drv별 cty 평균 (dplyr구문)
+mpg %>%
+  filter(!is.na(drv) & !is.na(cty)) %>% #결측치 제외
+  group_by(drv) %>% #dpr별 분리
+  summarise(mean_cty = mean(cty)) #cty 평균
+
+
+
+#Part 3 그래프 211104 ----------------------------------------
+#1. 산점도 geom_point()
+library(ggplot2) 
+ggplot(data = mpg, aes(x = displ, y = hwy)) + #데이터, 축 설정
+  geom_point() + #그래프 종류(산점도)
+  xlim(3, 6) + #x축 범위 설정 3~6
+  ylim(10, 30) #y축 범위 설정 10~30
+
+#p188 문제해결
+#Q1.mpg데이터의 cty와 hwy 산점도 그리기 
+ggplot(data = mpg, aes(x = cty, y = hwy)) + 
+  geom_point()
+
+#Q2.미국 지역별 인구통계 정보 midwest - 전체 인구(poptotal)와 아시아인(popasian) 인구 관계
+ggplot(data = midwest, aes(x = poptotal, y = popasian)) + 
+  geom_point() + 
+  xlim(0, 500000) + 
+  ylim(0, 10000)
+
+
+
+
+#2.막대그래프(qplot대체) geom_col()
+#구동 방식별 평균 고속도로 연비  
+
+
+
+
+
+
+
+
