@@ -383,17 +383,8 @@ df_suv <- mpg %>%
   head(5) #상위 5개 
 df_suv 
 
-mpg %>% 
-  group_by(manufacturer) %>%
-  filter(class == "suv") %>% #"suv"추출
-  mutate(tot = (cty + hwy)/2) %>% #통합 연비 변수 생성
-  summarise(totm = mean(tot)) %>% #통합 연비 평균 산출 
-  arrange(desc(totm)) %>%
-  head(5)
-    
-    
-    
-    
+ggplot(data = df_suv, aes(x = manufacturer, y = cty_mean)) + geom_col()
+
     
     
     
