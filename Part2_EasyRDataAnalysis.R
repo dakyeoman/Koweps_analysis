@@ -383,11 +383,27 @@ df_suv <- mpg %>%
   head(5) #상위 5개 
 df_suv 
 
-ggplot(data = df_suv, aes(x = manufacturer, y = cty_mean)) + geom_col()
+ggplot(data = df_suv, aes(x = reorder(manufacturer, -cty_mean), y = cty_mean)) + geom_col()
 
-    
-    
-    
-    
+#Q2. class 빈도그래프
+ggplot(data = mpg, aes(x = class)) + geom_bar()
+
+
+#4. 시계열그래프(선): x축에 시간, geom_line()
+ggplot(data = economics, aes(x = date, y = unemploy)) + geom_line()    
+ggplot(data = economics, aes(x = date, y =psavert)) + geom_line()  
+
+#Boxplox 상자 그림
+ggplot(data = mpg, aes(x = drv, y = hwy)) + geom_boxplot() #drv별 hwy
+
+#p198 문제 해결
+cty_c <- mpg %>%
+  filter(class == compact, subcompact, suv)
+
+ggplot(data = mpg, aes(x = ))
+
+
+
+
     
   
