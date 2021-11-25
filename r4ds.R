@@ -113,7 +113,7 @@ ggplot() +
     mapping = aes(x = displ, y = hwy)
   )
 
-#1.6.1 코드 작성 
+#1.6.1 <6> 코드 작성 
 #1.
 ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
   geom_point() + 
@@ -132,13 +132,33 @@ ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color = drv)) +
   )
 
 #4. 
-ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color = drv)) +
-  geom_point() + 
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+  geom_point(mapping = aes(color = drv)) + 
   geom_smooth(
     
     se = FALSE
   )
 
+#5. 
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color = drv, linetype = drv)) +
+  geom_point() + 
+  geom_smooth(
+    se = FALSE
+  )
 
+#6.
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color = drv, linetype = drv)) +
+  geom_point() + 
+  geom_smooth(
+    se = FALSE
+  )
 
+?ggplot
 
+#레이어마다 다른 데이터 지정 가능. (평활선에 경차만 지정)
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_point(mapping = aes(color = class)) + 
+  geom_smooth(
+    data = filter(mpg, class == "subcompact"),
+    se = FALSE 
+  )
